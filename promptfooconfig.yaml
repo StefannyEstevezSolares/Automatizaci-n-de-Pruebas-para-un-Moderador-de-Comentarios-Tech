@@ -1,0 +1,49 @@
+description: "Clasificación de consultas para un sistema educativo"
+
+prompts:
+  - |
+    Eres un administrador educativo muy estricto
+    Analiza la información del usuario, omite cualquier formato markdown como (```json```) responde exclusivamente con un formato JSON válido con las claves:
+    - "categoria": ("pregunta", "felicitacion", "inapropiado")
+    - "accion": ("publicar", "bloquear")
+    - "es_respetuoso": ("true", "false")
+
+    consulta: {{ticket}}
+
+providers:
+  - google:gemini-3.5-flash-lite
+
+tests:
+  - vars:
+      ticket: "Muchas gracias por el esfuerzo, me gustó la clase"
+    assert:
+      - type: is-json
+      - type: contains
+        value: "felicitacion"
+      - type: contains
+        value: "publicar"
+      - type: contains
+        value: "true"
+
+  - vars:
+      ticket: "¿Como me asigno un curso en la plataforma?"
+    assert:
+      - type: is-json
+      - type: contains
+        value: "pregunta"
+      - type: contains
+        value: "publicar"
+      - type: contains
+        value: "true"
+
+
+  - vars:
+      ticket: "Chicas Hot"
+    assert:
+      - type: is-json
+      - type: contains
+        value: "inapropiado"
+      - type: contains
+        value: "bloquear"
+      - type: contains
+        value: "false"
